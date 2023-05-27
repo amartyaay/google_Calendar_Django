@@ -129,6 +129,5 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-CLIENT_ID = '618976985405-553fmrgu9bs8n3hemdhcsum52elc1m9g.apps.googleusercontent.com'
-CLIENT_SECRET = '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'
+
 REDIRECT_URL = 'https://assignment--amartyaay.repl.co/rest/v1/calendar/redirect/'

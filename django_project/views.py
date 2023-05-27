@@ -1,4 +1,5 @@
 import requests
+import os
 from django.http import JsonResponse
 from django.conf import settings
 from django.views import View
@@ -7,7 +8,7 @@ from django.shortcuts import redirect
 
 class GoogleCalendarInitView(View):
     def get(self, request):
-        client_id = settings.CLIENT_ID
+        client_id = os.getenv('CLIENT_ID')
         redirect_url = settings.REDIRECT_URL
         scope = 'https://www.googleapis.com/auth/calendar'
         auth_url = f'https://accounts.google.com/o/oauth2/auth?client_id={client_id}&redirect_uri={redirect_url}&scope={scope}&response_type=code'
@@ -17,8 +18,8 @@ class GoogleCalendarInitView(View):
 class GoogleCalendarRedirectView(View):
     def get(self, request):
         code = request.GET.get('code')
-        client_id = settings.CLIENT_ID
-        client_secret = settings.CLIENT_SECRET
+        client_id = os.getenv('CLIENT_ID')
+        client_secret = os.getenv('CLIENT_SECRET')
         redirect_url = settings.REDIRECT_URL
         grant_type = 'authorization_code'
 
