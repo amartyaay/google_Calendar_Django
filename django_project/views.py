@@ -1,9 +1,9 @@
-import requests
 import os
 from django.http import JsonResponse
 from django.conf import settings
 from django.views import View
 from django.shortcuts import redirect
+from .utils import get_google_calendar_auth_url, get_google_calendar_access_token, get_google_calendar_events
 
 
 class GoogleCalendarInitView(View):
@@ -11,7 +11,7 @@ class GoogleCalendarInitView(View):
         client_id = os.getenv('CLIENT_ID')
         redirect_url = settings.REDIRECT_URL
         scope = 'https://www.googleapis.com/auth/calendar'
-        auth_url = f'https://accounts.google.com/o/oauth2/auth?client_id={client_id}&redirect_uri={redirect_url}&scope={scope}&response_type=code'
+        auth_url = get_google_calendar_auth_url(client_id, redirect_url, scope)
         return redirect(auth_url)
 
 
@@ -23,20 +23,7 @@ class GoogleCalendarRedirectView(View):
         redirect_url = settings.REDIRECT_URL
         grant_type = 'authorization_code'
 
-        token_url = 'https://accounts.google.com/o/oauth2/token'
-        data = {
-            'code': code,
-            'client_id': client_id,
-            'client_secret': client_secret,
-            'redirect_uri': redirect_url,
-            'grant_type': grant_type
-        }
-        response = requests.post(token_url, data=data)
-        access_token = response.json().get('access_token')
-
-        calendar_url = 'https://www.googleapis.com/calendar/v3/calendars/primary/events'
-        headers = {'Authorization': f'Bearer {access_token}'}
-        events_response = requests.get(calendar_url, headers=headers)
-        events = events_response.json().get('items', [])
-
+        access_token = get_google_calendar_access_token(
+            code, client_id, client_secret, redirect_url, grant_type)
+        events = get_google_calendar_events(access_token)
         return JsonResponse(events, safe=False)
